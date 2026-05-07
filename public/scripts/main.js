@@ -13,27 +13,43 @@ const COLORS = [
     { label: "Yellow", value: "#ffee44" },
 ];
 
+
 const ws = new WebSocket(WS_URL); // connect to WebSocket server
-let name = "Player";
-let host = false;
+export let name = "Player";
+export let host = false;
 let count = 0;
-let currentGame = "";
-let buzzer = {pressed: false, locked: false};
+export let currentGame = "";
+
+const messageHandlers = {};
+
+document.getElementById('button').onclick = handleClick;
+document.getElementById('buzzerBtn').onclick = () => selectGame('Buzzer');
+document.getElementById('game2Btn').onclick = () => selectGame('Game 2');
+document.getElementById('game3Btn').onclick = () => selectGame('Game 3');
+document.getElementById('startGameBtn').onclick = startGame;
+
+export function registerHandler(type, handler) {
+    messageHandlers[type] = handler;
+}
+
+export function sendMessage(type, payload = {}) {
+    ws.send(JSON.stringify({ type, ...payload }));
+}
+
+export function SwitchView(viewId) {
+    const views = ["landingPage", "waitingRoom", "whiteRoom", "host", "buzzerRoomGuest", "buzzerRoomHost"];
+    views.forEach(id => {
+        document.getElementById(id).style.display = id === viewId ? "block" : "none";
+    });
+    personalise(viewId)
+}
 
 function handleClick() {
     const panel = document.getElementById('panel');
     name = document.getElementById('name').value.trim() || "Player"; // add a random number to the end of this
     console.log(`Name set to: ${name}`); // debug
     count++;
-    ws.send(JSON.stringify({ type: "setName", name }));
-}
-
-function SwitchView(viewId) {
-    const views = ["landingPage", "waitingRoom", "whiteRoom", "host", "buzzerRoomGuest", "buzzerRoomHost"];
-    views.forEach(id => {
-        document.getElementById(id).style.display = id === viewId ? "block" : "none";
-    });
-    personalise(viewId)
+    sendMessage("setName", { name });
 }
 
 function startGame() {
@@ -68,14 +84,6 @@ function starting(g) {
     }
 }
 
-function buzzIn() {
-    if (!buzzer.locked && !buzzer.pressed) {
-        buzzer.pressed = true;
-        ws.send(JSON.stringify({ type: "buzz in", name }));
-        updateBuzzerText();
-    }    
-}
-
 function personalise(viewId) { // this is to add some personalisation to the waiting room and white room, like showing the player's name
     if (viewId === "waitingRoom") {
         document.getElementById('greeting').textContent = `Welcome, ${name}! Waiting for the host to start the game...`;
@@ -83,58 +91,15 @@ function personalise(viewId) { // this is to add some personalisation to the wai
 
 }
 
-function removeTop() {
-    if (host) {
-        const buzzedList = document.getElementById("buzzersUl");
-        n = buzzedList.firstChild ? buzzedList.firstChild.textContent : null;
-        if (buzzedList.children.length > 0) {
-            buzzedList.removeChild(buzzedList.firstChild);
-        }
-        // unbuzz the person
-        ws.send(JSON.stringify({ type: "unbuzz", name: n }));
-    }
-}
-
-function clearBuzzers() {
-    if (host) {
-        const buzzedList = document.getElementById("buzzersUl");
-        while (buzzedList.firstChild) {
-            buzzedList.removeChild(buzzedList.firstChild);
-        }
-        // notify to server to reset buzzers
-        ws.send(JSON.stringify({ type: "clear buzzers" }));
-    }
-}
-
-function lock() {
-    if (host) {
-        ws.send(JSON.stringify({ type: "lock buzzers" }));
-    }
-}
- 
-function unlock() {
-    if (host) {
-        ws.send(JSON.stringify({ type: "unlock buzzers" }));
-    }
-}
-
-function updateBuzzerText() {
-    const buzzInButton = document.getElementById("buzzInButton");
-    console.log(`Buzzer state - Locked: ${buzzer.locked}, Pressed: ${buzzer.pressed}`); // debug
-    if (buzzer.locked) {
-        buzzInButton.textContent = "Locked";
-        return
-    }
-    if (buzzer.pressed) {
-        buzzInButton.textContent = "You Buzzed In!";
-        return
-    }
-    buzzInButton.textContent = "Buzz In Dummy!";
-    
-}
-
 ws.onmessage = (event) => {
     const msg = JSON.parse(event.data);
+    const handler = messageHandlers[msg.type];
+    if (handler) {
+        console.log(`Handling message of type: ${msg.type}`); // debug
+        handler(msg);
+    } else {
+        console.warn(`No handler registered for message type: ${msg.type}`);
+    }
 
     if (msg.type === "nameSet") {
         console.log(`Name set to: ${msg.name}`);
@@ -158,29 +123,6 @@ ws.onmessage = (event) => {
             // we want to update the text to say what game we are playing, e.g. "You are playing: [game name]"
             document.getElementById('greeting').textContent = `Welcome, ${name}! Waiting for the host to start the ${msg.game}...`;
 
-        }
-    }
-
-    if (msg.type === "clear buzzers") {
-        buzzer.pressed = false;
-        buzzer.locked = false;
-        updateBuzzerText();
-    }
-
-    if (msg.type === "lock buzzers") {
-        buzzer.locked = true;
-        updateBuzzerText();
-    }
-
-    if (msg.type === "unlock buzzers") {
-        buzzer.locked = false;
-        updateBuzzerText();
-    }
-
-    if (msg.type === "unbuzz") {
-        if (msg.name === name) {
-            buzzer.pressed = false;
-            updateBuzzerText();
         }
     }
 
@@ -211,19 +153,6 @@ ws.onmessage = (event) => {
     if (msg.type === "starting") {
         console.log("Game is starting!");
         starting(msg.game);
-    }
-
-    if (msg.type === "buzz in") {
-        console.log(`${msg.name} buzzed in!`);
-        // Add the name to the unordered list in the host view
-        if (document.getElementById("buzzerRoomHost").style.display === "block") { // all host commands
-            const buzzedList = document.getElementById("buzzersUl");
-            const li = document.createElement("li");
-            li.textContent = msg.name;
-            buzzedList.appendChild(li);
-        } else {
-            console.log("Not updating buzzed list because host view is not active");
-        }
     }
 
 };
