@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign In</title>
+</head>
+<body>
+    <div id="landingPage" >
+        <h1>
+        Choose your name
+        </h1>
+        <input type="text" id="name" placeholder="Enter your name" />
+        <p id="btntxt">"Player" clicked the button 0 times!</p>
+        <button type="button" onclick="handleClick()">Click Me!</button>
+    </div>
+    <div id="waitingRoom" style="display:none">
+        <h1 id="greeting">Greetings!!</h1>
+        <h1 id="waitingMessage">Waiting for other players...</h1>
+    </div>
+
+    <div id="buzzerRoomGuest" style="display:none">
+        <h1>Welcome to the Buzzer</h1>
+        <button type="button" id="buzzInButton" onclick="buzzIn()">Buzz In!!</button>
+    </div>
+
+    <div id="buzzerRoomHost" style="display:none">
+        <button type="button" id="rmtp" onclick = "removeTop()">Remove Top Buzzer</button>
+        <button type="button" id="clr" onclick = "clearBuzzers()">Clear Buzzers</button>
+        <button type="button" id="rmbz" onclick = "lock()">Lock Buzzers</button>
+        <button type="button" id="rmbz" onclick = "unlock()">Unlock Buzzers</button>
+        <h1>Welcome to the Buzzer as a HOST!!</h1>
+        <ul id="buzzersUl"></ul>
+    </div>
+
+    <div id="host" style="display:none">
+        <h1 id="hostGreeting">Welcome, Host!</h1>
+        <h1 id="hostMessage">You are the host. Waiting for players to join...</h1>
+        <p id="playersList"> Players in the room: </p>
+        <ul id="playersUl"></ul>
+
+
+        <p id="gameOptions"> Game Options: </p>
+        <ul id="gameOptionsUl">
+            <li><button onclick="selectGame('Buzzer')">Buzzer</button></li>
+            <li><button onclick="selectGame('Game 2')">Game 2</button></li>
+            <li><button onclick="selectGame('Game 3')">Game 3</button></li>
+        </ul>
+        <p id="picked"> Picked Game: </p>
+        <button type="button" id="startGameBtn" onclick="startGame()">Start Game</button>
+    </div>
+    <div id="whiteRoom" style="display:none">
+    </div>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
