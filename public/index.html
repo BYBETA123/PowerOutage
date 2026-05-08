@@ -15,6 +15,25 @@
     <div id="waitingRoom" style="display:none">
         <h1 id="greeting">Greetings!!</h1>
         <h1 id="waitingMessage">Waiting for other players...</h1>
+        <div id="findThisColor" style="width: 200px; height: 100px; background-color: #04af2f;"></div>   
+        <div id="myColor" style="width: 200px; height: 100px; background-color: #000000;"></div>
+         <div class="slider-container">
+            <label for="mySlider">Red:</label>
+            <input type="range" id="mySliderRed" min="0" max="256" value="50" class="slider">
+            <label for="mySlider" id="RedHex">#00</label>
+        </div>
+         <div class="slider-container">
+            <label for="mySlider">Green:</label>
+            <input type="range" id="mySliderGreen" min="0" max="256" value="50" class="slider">
+            <label for="mySlider" id="GreenHex">#00</label>
+        </div>
+         <div class="slider-container">
+            <label for="mySlider">Blue:</label>
+            <input type="range" id="mySliderBlue" min="0" max="256" value="50" class="slider">
+            <label for="mySlider" id="BlueHex">#00</label>
+        </div>
+        <label id="scoreLabel">Score: 0</label>
+        <button type="button" id="checkColor">Submit</button>
     </div>
 
     <div id="buzzerRoomGuest" style="display:none">
@@ -51,5 +70,6 @@
     </div>
     <script type="module" src="scripts/main.js"></script>
     <script type="module" src="scripts/buzzer.js"></script>
+    <script type="module" src="scripts/colors.js"></script>
 </body>
 </html>
