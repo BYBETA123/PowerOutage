@@ -1,75 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Sign In</title>
+    <meta charset="UTF-8">
+    <link href="styles/style.css" rel="stylesheet" />
+    <title>Sign In</title>
 </head>
+
 <body>
-    <div id="landingPage" >
+    <div id="landingPage" class="centered">
         <h1>
-        Choose your name
+            Choose your name
         </h1>
         <input type="text" id="name" placeholder="Enter your name" />
         <button type="button" id="button">Click Me!</button>
     </div>
-    <div id="waitingRoom" style="display:none">
+    <div id="waitingRoom" style="display:none" class="centered">
         <h1 id="greeting">Greetings!!</h1>
-        <h1 id="waitingMessage">Waiting for other players...</h1>
-        <div id="findThisColor" style="width: 200px; height: 100px; background-color: #04af2f;"></div>   
-        <div id="myColor" style="width: 200px; height: 100px; background-color: #000000;"></div>
-         <div class="slider-container">
-            <label for="mySlider">Red:</label>
-            <input type="range" id="mySliderRed" min="0" max="256" value="50" class="slider">
-            <label for="mySlider" id="RedHex">#00</label>
+        <div id="findThisColor" class="colorBox" style="background-color: #2a9d4b;"></div>
+        <div id="myColor" class="colorBox" style="background-color: #000000;"></div>
+        <div class="sliderRow">
+            <div class="slider-container">
+                <label>Red:</label>
+                <input type="range" id="mySliderRed" min="0" max="256" value="0" class="slider">
+                <label id="RedHex">#00</label>
+            </div>
+            <div class="slider-container">
+                <label>Green:</label>
+                <input type="range" id="mySliderGreen" min="0" max="256" value="0" class="slider">
+                <label id="GreenHex">#00</label>
+            </div>
+            <div class="slider-container">
+                <label>Blue:</label>
+                <input type="range" id="mySliderBlue" min="0" max="256" value="0" class="slider">
+                <label id="BlueHex">#00</label>
+            </div>
         </div>
-         <div class="slider-container">
-            <label for="mySlider">Green:</label>
-            <input type="range" id="mySliderGreen" min="0" max="256" value="50" class="slider">
-            <label for="mySlider" id="GreenHex">#00</label>
-        </div>
-         <div class="slider-container">
-            <label for="mySlider">Blue:</label>
-            <input type="range" id="mySliderBlue" min="0" max="256" value="50" class="slider">
-            <label for="mySlider" id="BlueHex">#00</label>
-        </div>
-        <label id="scoreLabel">Score: 0</label>
-        <button type="button" id="checkColor">Submit</button>
+
+        <hr>
+        <label id="scoreLabel" style="font-size:xx-large">Score: 0</label>
+        <button type="button" id="checkColor" style="font-size:xx-large">Submit</button>
     </div>
 
-    <div id="buzzerRoomGuest" style="display:none">
-        <h1>Welcome to the Buzzer</h1>
-        <button type="button" id="buzzInButton">Buzz In!!</button>
+    <div id="buzzerRoomGuest" style="display:none" class="centered">
+        <h1 id="buzzerIntro" style="font-size:xx-large"> Welcome to the buzzer!!</h1>
+        <button type="button" id="buzzInButton" class="button">Buzz In!!</button>
     </div>
 
-    <div id="buzzerRoomHost" style="display:none">
-        <button type="button" id="rmtp">Remove Top Buzzer</button>
-        <button type="button" id="clr">Clear Buzzers</button>
-        <button type="button" id="lockbuzzer">Lock Buzzers</button>
-        <button type="button" id="unlockbuzzer">Unlock Buzzers</button>
+    <div id="buzzerRoomHost" style="display:none" class="centered">
         <h1>Welcome to the Buzzer as a HOST!!</h1>
+        <button type="button" id="rmtp" style="font-size:xx-large">Remove Top Buzzer</button>
+        <button type="button" id="clr" style="font-size:xx-large">Clear Buzzers</button>
+        <button type="button" id="lockbuzzer" style="font-size:xx-large">Lock Buzzers</button>
+        <button type="button" id="unlockbuzzer" style="font-size:xx-large">Unlock Buzzers</button>
         <ul id="buzzersUl"></ul>
     </div>
 
-    <div id="host" style="display:none">
+    <div id="host" style="display:none" class="centered">
         <h1 id="hostGreeting">Welcome, Host!</h1>
         <h1 id="hostMessage">You are the host. Waiting for players to join...</h1>
         <p id="playersList"> Players in the room: </p>
-        <ul id="playersUl"></ul>
+        <ul id="playersUl" style="list-style: none;"></ul>
 
 
         <p id="gameOptions"> Game Options: </p>
-        <ul id="gameOptionsUl">
+        <ul id="gameOptionsUl" style="list-style: none;">
             <li><button id="buzzerBtn">Buzzer</button></li>
-            <li><button id="game2Btn">Game 2</button></li>
+            <li><button id="RPSBtn">RPS</button></li>
             <li><button id="game3Btn">Game 3</button></li>
         </ul>
         <p id="picked"> Picked Game: </p>
         <button type="button" id="startGameBtn">Start Game</button>
+    </div>
+    <div id="RPSGuest" class="app" style="display:none">
+
+        <!-- ── Sidebar (20%) ── -->
+        <div id="sidebar">
+            <h2>Controls</h2>
+
+            <!-- Placeholder text + input + button -->
+            <div class="sidebar-section">
+                <label>Input the Coordinates you would like to summon at</label>
+                <label for="itemSelector">Choose a item:</label>
+                <select id="items" name="item">
+                    <option value="rock">Rock</option>
+                    <option value="paper">Paper</option>
+                    <option value="scissors">Scissors</option>
+                </select>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="number" id="xcoordinate" placeholder="X Coordinate"
+                        style="width: 45%; display: inline-block;" min="0" max="19" value="0"/>
+                    <input type="number" id="ycoordinate" placeholder="Y Coordinate"
+                        style="width: 45%; display: inline-block;" min="0" max="19" value="0"/>
+                </div>
+                <button id="summon">Summon</button>
+                <div class="host-only-RPS">
+                    <button id="start">Start Game</button>
+                    <button id="reset">Reset Game</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <label>Terminal</label>
+                <label id="placeholder-notes"></label>
+            </div>
+        </div>
+
+        <!-- ── Canvas area (80%) ── -->
+        <main id="canvas-area">
+            <div id="viewport">
+                <div id="grid">
+                    <!-- Cells injected by JS -->
+                </div>
+            </div>
+        </main>
     </div>
     <div id="whiteRoom" style="display:none">
     </div>
     <script type="module" src="scripts/main.js"></script>
     <script type="module" src="scripts/buzzer.js"></script>
     <script type="module" src="scripts/colors.js"></script>
+    <script type="module" src="scripts/RPS.js"></script>
 </body>
+
 </html>

@@ -24,7 +24,7 @@ const messageHandlers = {};
 
 document.getElementById('button').onclick = handleClick;
 document.getElementById('buzzerBtn').onclick = () => selectGame('Buzzer');
-document.getElementById('game2Btn').onclick = () => selectGame('Game 2');
+document.getElementById('RPSBtn').onclick = () => selectGame('RPS');
 document.getElementById('game3Btn').onclick = () => selectGame('Game 3');
 document.getElementById('startGameBtn').onclick = startGame;
 
@@ -37,9 +37,9 @@ export function sendMessage(type, payload = {}) {
 }
 
 export function SwitchView(viewId) {
-    const views = ["landingPage", "waitingRoom", "whiteRoom", "host", "buzzerRoomGuest", "buzzerRoomHost"];
+    const views = ["landingPage", "waitingRoom", "whiteRoom", "host", "buzzerRoomGuest", "buzzerRoomHost", "RPSGuest", "RPSHost"];
     views.forEach(id => {
-        document.getElementById(id).style.display = id === viewId ? "block" : "none";
+        document.getElementById(id).style.display = id === viewId ? "flex" : "none";
     });
     personalise(viewId)
 }
@@ -59,10 +59,12 @@ function startGame() {
         alert("Please select a game mode before starting the game."); // dialog box
         return
     } else if (currentGame == "Buzzer") {
-        // alert("Starting Buzzer Game!"); // dialog box
         ws.send(JSON.stringify({ type: "starting", game: currentGame }));
+    } else if (currentGame == "RPS") {
+        ws.send(JSON.stringify({ type: "starting", game: currentGame }));
+    } else {
+        alert("Selected game mode is not implemented yet.");
     }
-
 }
 
 function selectGame(game) {
@@ -80,6 +82,14 @@ function starting(g) {
             SwitchView("buzzerRoomHost");
         } else {
             SwitchView("buzzerRoomGuest");
+            document.getElementById('buzzerIntro').textContent = `Welcome to the buzzer, you are playing as \"${name}\"!!`;
+        }
+    } else if (g == "RPS") {
+        if (host) {
+            SwitchView("RPSGuest");
+            document.querySelector(".host-only-RPS").style.display = "block";
+        } else {
+            SwitchView("RPSGuest");
         }
     }
 }
@@ -88,7 +98,6 @@ function personalise(viewId) { // this is to add some personalisation to the wai
     if (viewId === "waitingRoom") {
         document.getElementById('greeting').textContent = `Welcome, ${name}! Waiting for the host to start the game...`;
     }
-
 }
 
 ws.onmessage = (event) => {

@@ -1,7 +1,5 @@
 import { registerHandler, sendMessage, SwitchView, name} from './main.js';
 
-// document.getElementById("findThisColor")
-// document.getElementById("myColor")
 document.getElementById("mySliderRed").oninput = () => updateColor();
 document.getElementById("mySliderGreen").oninput = () => updateColor();
 document.getElementById("mySliderBlue").oninput = () => updateColor();
@@ -22,6 +20,7 @@ function updateColor() {
 
 function verifyAndRefresh() {
     const findColor = document.getElementById("findThisColor").style.backgroundColor;
+    console.log(document.getElementById("findThisColor").style.backgroundColor);
     const myColor = document.getElementById("myColor").style.backgroundColor;
     console.log(`Verifying colors: findColor=${findColor}, myColor=${myColor}`); // debug
     const [r1, g1, b1] = findColor.match(/\d+/g).map(Number);

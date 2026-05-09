@@ -1,0 +1,246 @@
+
+body {
+    margin: 0;
+    /* min-height: 100vh; */
+    /* display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; */
+    font-family: sans-serif;
+    transition: background-color 0.4s ease;
+}
+
+.debug {
+  border: solid red 2px;
+}
+
+:root {
+    --sidebar-width: 20%;
+    --grid-size: 1000px;
+    --cell-size: 40px;
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --panel: #0f3460;
+    --accent: #e94560;
+    --text: #eaeaea;
+    --text-muted: #888;
+    --border: rgba(255,255,255,0.08);
+}
+
+.centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align:center;
+    min-height: 100vh;
+}
+
+.colorBox {
+    width: 50vw;
+    height: 30vh;
+    margin: 0 auto;
+}
+
+/* Base button style */
+.button {
+  width: 70vw;
+  height: 70vh;
+
+  border: none;
+  border-radius: 50%;
+
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: bold;
+  color: white;
+  background-color: #2a9d4b;
+  cursor: pointer;
+  user-select: none;
+
+  /* Removes ugly mobile tap highlight */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sliderRow {
+    display: flex;
+    width: 50vw;
+    margin: 0 auto;
+}
+
+.slider-container {
+    flex: 1;                /* each slider gets equal width */
+    font-size: xx-large;
+}
+
+.slider {
+  appearance:none;
+  width: 30%;
+  height: 10px;
+  background: #d3d3d3;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #04AA6D;
+  cursor: pointer;
+}
+
+/* ── Layout ── */
+.app {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
+
+/* ── Sidebar ── */
+#sidebar {
+  width: var(--sidebar-width);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex:1;
+  gap: 1rem;
+  padding: 1rem;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+#sidebar h2 {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-section label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.sidebar-section input[type="text"],
+.sidebar-section textarea {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 0.4rem 0.6rem;
+  font-size: 13px;
+  resize: none;
+  outline: none;
+}
+
+.sidebar-section input[type="text"]:focus,
+.sidebar-section textarea:focus {
+  border-color: var(--accent);
+}
+
+.sidebar-section button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 0.75rem;
+  font-size: 13px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.sidebar-section button:hover { opacity: 0.85; }
+
+/* ── Colour picker swatches ── */
+#colour-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.1s, transform 0.1s;
+}
+
+.swatch:hover { transform: scale(1.1); }
+.swatch.selected { border-color: #fff; }
+
+/* ── Canvas area ── */
+#canvas-area {
+  flex: 4;
+  overflow: auto;
+  width: 80vw;
+  position: relative;
+  cursor: grab;
+  background-color:purple;
+}
+
+#canvas-area.panning { cursor: grabbing; }
+
+/* ── The pannable viewport ── */
+#viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  background-color: pink;
+}
+
+/* ── The grid ── */
+#grid {
+  width: var(--grid-size);
+  height: var(--grid-size);
+  display: grid;
+  grid-template-columns: repeat(calc(1000 / 40), var(--cell-size));
+  grid-template-rows:    repeat(calc(1000 / 40), var(--cell-size));
+  border: 1px solid var(--border);
+  position: relative;
+  background-image:
+    linear-gradient(to right, black 1px, transparent 1px),
+    linear-gradient(to bottom, black 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Subtle dot-grid background */
+#grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+  background-size: var(--cell-size) var(--cell-size);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border: 1px solid rgba(255,255,255,0.03);
+  position: relative;
+  z-index: 1;
+  transition: background-color 0.1s;
+  cursor: crosshair;
+}
+
+.cell:hover {
+  border-color: rgba(255,255,255,0.15);
+}
+
+.host-only {
+  display: none;
+}

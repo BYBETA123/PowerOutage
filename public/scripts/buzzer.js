@@ -94,11 +94,14 @@ function updateBuzzerText() {
     console.log(`Buzzer state - Locked: ${buzzer.locked}, Pressed: ${buzzer.pressed}`); // debug
     if (buzzer.locked) {
         buzzInButton.textContent = "Locked";
+        buzzInButton.style.backgroundColor = "#d62828";
         return
     }
     if (buzzer.pressed) {
         buzzInButton.textContent = "You Buzzed In!";
+        buzzInButton.style.backgroundColor = "#2563eb";
         return
     }
     buzzInButton.textContent = "Buzz In Dummy!";
+    buzzInButton.style.backgroundColor = "#2a9d4b";
 }

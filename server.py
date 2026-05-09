@@ -3,17 +3,32 @@ import json
 import http.server
 import threading
 import websockets
-
+from RPS import RPSGame
 clients = []
+currentGrid = []
+inGame = "" # "" is false, otherwise populated with game name
+currentRPSGame = None
+identifier = 0
 
 def broadcast(message): # broadcast a message to all clients
+
     json_msg = json.dumps(message)
+
     for entry in clients:
         asyncio.run_coroutine_threadsafe(
             entry["ws"].send(json_msg),
             entry["loop"]
         )
 
+async def game_loop():
+    msg = ""
+    while msg != "end":
+        broadcast({
+            "type": "updateGrid",
+            "g": currentRPSGame.iconList,
+        })
+        msg = currentRPSGame.tick()
+        await asyncio.sleep(0.025)
 
 async def main():
     async with websockets.serve(ws_handler, "localhost", 8765):
@@ -21,7 +36,7 @@ async def main():
         await asyncio.Future()  # run forever
 
 async def ws_handler(ws):
-    # is_host = len(clients) == 0
+    global inGame
     loop = asyncio.get_event_loop()
     client = {"ws": ws, "name": "REMOVEME", "loop": loop, "host": False}
     clients.append(client)
@@ -76,12 +91,25 @@ async def ws_handler(ws):
                     "type": "playerJoined",
                     "namelist" : [c["name"] if c["name"] != "REMOVEME" else None for c in clients],
                 })
+
+                # if we are in a game, fast track them into the room
+                print(inGame)
+                if inGame != "":
+                    await ws.send(json.dumps({
+                        "type": "starting",
+                        "game": inGame,
+                    }))
+
                 
             if msg["type"] == "foundGame":
                 broadcast({
                     "type": "gameFound",
                     "game": msg["game"],
                 })
+                identifier = 0 # reset the identifier for the grid icons, so they are consistent across clients
+                print(inGame)
+                inGame = msg["game"]
+                print(inGame)
 
             if msg["type"] == "buzz in":
                 # find the host client
@@ -116,6 +144,19 @@ async def ws_handler(ws):
                     "type": "unbuzz",
                     "name": msg["name"],
                 })
+
+            if msg["type"] == "summon":
+                currentGrid.append([msg["x"]*50, msg["y"]*50, msg["img"], msg["target"], identifier])
+                identifier += 1
+                broadcast({
+                    "type": "updateGrid",
+                    "g": currentGrid,
+                })
+
+            if msg["type"] == "startRPS":
+                global currentRPSGame
+                currentRPSGame = RPSGame(currentGrid)
+                asyncio.create_task(game_loop())
 
     except websockets.exceptions.ConnectionClosed:
         pass
